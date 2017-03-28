@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 2048
+  end
+  config.vm.provision "shell", inline: <<-SHELL
+    sed -i.bak -e "s%http://archive.ubuntu.com/ubuntu%http://ftp.iij.ad.jp/pub/linux/ubuntu/archive%g" /etc/apt/sources.list
+    apt update
+    apt install -y language-pack-ja git python3-venv
+  SHELL
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    mkdir ~/environments
+    python3 -m venv ~/environments/my_env
+    . ~/environments/my_env/bin/activate
+    pip install --upgrade pip
+    pip install jupyter pandas matplotlib seaborn scikit-learn
+    mkdir ~/.jupyter
+    cp /vagrant/jupyter_notebook_config.py ~/.jupyter/
+    mkdir ~/names
+    cd ~/names
+    curl -s -O https://www.ssa.gov/oact/babynames/names.zip
+  SHELL
+end
