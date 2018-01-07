@@ -8,12 +8,4 @@ First, Start the VM with `vagrant up`.
 
 Then, Access to http://192.168.33.10/fib.php, Benchmark script will run.
 
-Finally, You can access to xhgui on  http://192.168.33.10/xhgui/.
-
-## License
-
-MIT
-
-## Author
-
-[Takuya Arita](https://github.com/ariarijp)
+Finally, You can access to xhgui on http://192.168.33.10/xhgui/.
