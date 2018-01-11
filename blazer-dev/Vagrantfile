@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.network "forwarded_port", guest: 3000, host: 3000
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get -y install build-essential ruby ruby-dev libxml2-dev zlib1g-dev postgresql-9.5 libpq-dev nodejs
+    sudo gem install bundler
+    cd /tmp/
+    git clone https://github.com/ankane/blazer.git
+    git clone https://github.com/ankane/blazer-dev.git
+    sudo mv blazer blazer-dev /opt/
+    cd /opt/blazer-dev/
+    sudo bundle
+    cp /vagrant/database.yml config/database.yml
+    echo "CREATE ROLE blazer_dev WITH CREATEDB LOGIN ENCRYPTED PASSWORD 'secret123';" | sudo -u postgres psql
+    rake db:create db:migrate
+    export PGPASSWORD=secret123
+    createdb -h 127.0.0.1 -U blazer_dev movielens
+    curl https://raw.githubusercontent.com/ankane/movielens.sql/master/movielens.sql | psql -h 127.0.0.1 -U blazer_dev movielens
+    rake db:seed
+    echo "BLAZER_DATABASE_URL=postgres://blazer_dev:${PGPASSWORD}@127.0.0.1/movielens" >> .env
+    unset PGPASSWORD
+  SHELL
+end
