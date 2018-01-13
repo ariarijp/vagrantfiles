@@ -8,8 +8,10 @@ Vagrant.configure("2") do |config|
     vb.memory = "1024"
   end
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+    sudo add-apt-repository 'deb [arch=amd64,i386] https://cran.rstudio.com/bin/linux/ubuntu xenial/'
     sudo apt-get update
-    sudo apt-get -y install build-essential ruby ruby-dev libxml2-dev zlib1g-dev postgresql-9.5 libpq-dev nodejs
+    sudo apt-get -y install build-essential ruby ruby-dev libxml2-dev libcurl-ocaml-dev zlib1g-dev postgresql-9.5 libpq-dev nodejs r-base
     sudo gem install bundler
     cd /tmp/
     git clone https://github.com/ankane/blazer.git
@@ -26,5 +28,7 @@ Vagrant.configure("2") do |config|
     rake db:seed
     echo "BLAZER_DATABASE_URL=postgres://blazer_dev:${PGPASSWORD}@127.0.0.1/movielens" >> .env
     unset PGPASSWORD
+    sudo R -e "install.packages('devtools', repos='http://cran.rstudio.com/')"
+    sudo R -e "devtools::install_github('twitter/AnomalyDetection')"
   SHELL
 end
