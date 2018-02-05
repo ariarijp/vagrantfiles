@@ -1,0 +1,11 @@
+[Unit]
+Description=Metabase
+
+[Service]
+EnvironmentFile=/etc/default/metabase
+ExecStart=/usr/bin/java -jar /opt/metabase/metabase.jar
+Restart = always
+Type = simple
+
+[Install]
+WantedBy = multi-user.target

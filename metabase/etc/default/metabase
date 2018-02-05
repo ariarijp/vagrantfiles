@@ -1,0 +1,12 @@
+MB_LOGFILE=/opt/metabase/metabase.log
+MB_PASSWORD_COMPLEXITY=normal
+MB_PASSWORD_LENGTH=10
+MB_JETTY_HOST=0.0.0.0
+MB_JETTY_PORT=8080
+MB_DB_TYPE=postgres
+MB_DB_DBNAME=metabase
+MB_DB_PORT=5432
+MB_DB_USER=metabase
+MB_DB_PASS=metabase
+MB_DB_HOST=localhost
+MB_EMOJI_IN_LOGS=true

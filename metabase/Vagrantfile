@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+  end
+  config.vm.provision "shell", inline: <<-SHELL
+    apt update
+    apt install -y expect openjdk-8-jre-headless postgresql-9.5
+    adduser --system metabase
+    expect -c "
+set timeout 5
+spawn sudo -u postgres createuser -d -P metabase
+expect \\"Enter password for new role:\\"
+send \\"metabase\\n\\"
+expect \\"Enter it again:\\"
+send \\"metabase\\n\\"
+expect \\"$\\"
+exit 0
+"
+    sudo -u metabase createdb metabase
+    mkdir /opt/metabase
+    wget -q -O /opt/metabase/metabase.jar http://downloads.metabase.com/v0.27.2/metabase.jar
+    chown -R metabase /opt/metabase
+    cp /vagrant/etc/systemd/system/metabase.service /etc/systemd/system/
+    cp /vagrant/etc/default/metabase /etc/default/
+    systemctl enable metabase
+    systemctl start metabase
+  SHELL
+end
